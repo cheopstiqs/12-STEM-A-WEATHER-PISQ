@@ -247,3 +247,119 @@ footer a { color: rgba(246,244,239,0.6); }
 @media (max-width: 420px) {
   .details { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ======================================================
+   TEMPERATURE BRACELET SECTION
+   Matches the same dark/blur "verdict card" look already
+   used above, so it fits the sky theme instead of clashing.
+   ====================================================== */
+
+#bracelet-section {
+  position: relative;
+  z-index: 2;
+  width: min(640px, calc(100% - 32px));
+  max-width: 640px;
+  margin: 32px auto 0;
+  padding: clamp(22px, 5vw, 36px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(246,244,239,0.05);
+  backdrop-filter: blur(2px);
+  color: var(--mist);
+  text-align: center;
+}
+
+#bracelet-section h2 {
+  margin: 0 0 7px;
+  font: 400 clamp(24px, 5vw, 32px)/1.1 'Fraunces', Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+#bracelet-section .bracelet-intro {
+  margin: 0 0 22px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(246, 244, 239, 0.7);
+}
+
+#bracelet-connect {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 22px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mist);
+  font: 600 14px/1.3 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+#bracelet-connect:hover:not(:disabled) {
+  background: rgba(246,244,239,0.12);
+  border-color: var(--mist);
+}
+
+#bracelet-connect:focus-visible {
+  outline: 2px solid var(--mist);
+  outline-offset: 2px;
+}
+
+#bracelet-connect:disabled { opacity: 0.6; cursor: wait; }
+
+#bracelet-status {
+  margin: 14px 0 20px;
+  color: rgba(246,244,239,0.65);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#bracelet-section .bracelet-readings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#bracelet-section .bracelet-box {
+  min-width: 0;
+  padding: 18px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(246, 244, 239, 0.04);
+}
+
+#bracelet-section .bracelet-box h3 {
+  margin: 0 0 8px;
+  color: rgba(246, 244, 239, 0.6);
+  font: 500 11px/1.3 'Inter', sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#bracelet-section .bracelet-value {
+  margin: 0;
+  font: 400 clamp(24px, 6vw, 34px)/1.1 'Fraunces', Georgia, serif;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+#bracelet-warning {
+  margin: 16px 0 0;
+  color: rgba(246,244,239,0.7);
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+#bracelet-warning[data-alert="high"] { color: #f7b6a8; }
+#bracelet-warning[data-alert="waiting"] { color: rgba(246,244,239,0.55); }
+
+@media (max-width: 420px) {
+  #bracelet-section {
+    margin-top: 20px;
+    padding: 22px 16px;
+  }
+  #bracelet-section .bracelet-readings { gap: 8px; }
+  #bracelet-section .bracelet-box { padding: 16px 8px; }
+}
