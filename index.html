@@ -149,7 +149,7 @@
   }
 
   function shouldGoOutside(code, apparentC, windKmh) {
-    const severeCodes = [67, 75, 82, 86, 95, 96, 99]; // heavy freezing rain, heavy snow, violent showers, hail, thunder
+    const severeCodes = [67, 75, 82, 86, 95, 96, 99];
     if (severeCodes.includes(code)) {
       return { yes: false, reason: 'Storm-level weather out there — best to stay in until it passes.', caution: null };
     }
@@ -480,6 +480,112 @@
   }
 
   fetchWeather(cityInput.value.trim());
+</script>
+
+<section id="bracelet-section" aria-labelledby="bracelet-heading">
+  <h2 id="bracelet-heading">Temperature Bracelet</h2>
+  <p class="bracelet-intro">Live temperature and humidity from your ESP32-C6 Beetle</p>
+
+  <button id="bracelet-connect" type="button">Connect Bracelet</button>
+  <p id="bracelet-status" role="status" aria-live="polite">Not connected</p>
+
+  <div class="bracelet-readings">
+    <div class="bracelet-box">
+      <h3>Temperature</h3>
+      <p id="bracelet-temp" class="bracelet-value">-- °C</p>
+    </div>
+    <div class="bracelet-box">
+      <h3>Humidity</h3>
+      <p id="bracelet-humidity" class="bracelet-value">-- %</p>
+    </div>
+  </div>
+
+  <p id="bracelet-warning" data-alert="waiting" aria-live="polite">Waiting for a sensor reading...</p>
+</section>
+
+<script>
+(() => {
+  'use strict';
+
+  // Must match the ESP32 Arduino sketch.
+  const SERVICE_UUID = '12345678-1234-1234-1234-123456789000';
+  const CHARACTERISTIC_UUID = '12345678-1234-1234-1234-123456789001';
+  const HIGH_TEMP_LIMIT = 35; // Ambient-temperature demo threshold; NOT a fever alarm.
+
+  const connectButton = document.getElementById('bracelet-connect');
+  const statusText = document.getElementById('bracelet-status');
+  const tempText = document.getElementById('bracelet-temp');
+  const humidityText = document.getElementById('bracelet-humidity');
+  const warningText = document.getElementById('bracelet-warning');
+
+  function clearReading() {
+    tempText.textContent = '-- °C';
+    humidityText.textContent = '-- %';
+    warningText.textContent = 'Waiting for a sensor reading...';
+    warningText.dataset.alert = 'waiting';
+  }
+
+  function showReading(value) {
+    const data = new TextDecoder().decode(value);
+    const parts = data.split(',');
+    if (parts.length !== 2) return;
+
+    const temperature = Number(parts[0]);
+    const humidity = Number(parts[1]);
+    if (!Number.isFinite(temperature) || !Number.isFinite(humidity)) return;
+
+    tempText.textContent = temperature.toFixed(1) + ' °C';
+    humidityText.textContent = humidity.toFixed(1) + ' %';
+    warningText.dataset.alert = temperature >= HIGH_TEMP_LIMIT ? 'high' : 'normal';
+    warningText.textContent = temperature >= HIGH_TEMP_LIMIT
+      ? 'High surrounding-air temperature detected.'
+      : 'Temperature is below the environmental alert threshold.';
+  }
+
+  async function connectBracelet() {
+    if (!navigator.bluetooth) {
+      statusText.textContent = 'Web Bluetooth is unavailable. Try Chrome on Android or Chrome/Edge on a compatible laptop.';
+      return;
+    }
+
+    connectButton.disabled = true;
+    statusText.textContent = 'Searching for TempBracelet...';
+
+    try {
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ name: 'TempBracelet' }],
+        optionalServices: [SERVICE_UUID]
+      });
+
+      device.addEventListener('gattserverdisconnected', () => {
+        statusText.textContent = 'Bracelet disconnected. Click Connect Bracelet to reconnect.';
+        clearReading();
+        connectButton.disabled = false;
+      });
+
+      statusText.textContent = 'Connecting...';
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService(SERVICE_UUID);
+      const characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+
+      characteristic.addEventListener('characteristicvaluechanged', event => {
+        showReading(event.target.value);
+      });
+
+      await characteristic.startNotifications();
+      showReading(await characteristic.readValue());
+      statusText.textContent = 'Bracelet connected. Live readings will appear below.';
+      connectButton.disabled = true;
+    } catch (error) {
+      statusText.textContent = 'Connection failed: ' + error.message;
+      clearReading();
+      connectButton.disabled = false;
+      console.error('Bracelet Bluetooth connection:', error);
+    }
+  }
+
+  connectButton.addEventListener('click', connectBracelet);
+})();
 </script>
 
 </body>
