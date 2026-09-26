@@ -558,7 +558,7 @@
       });
 
       device.addEventListener('gattserverdisconnected', () => {
-        statusText.textContent = 'Bracelet disconnected. Click Connect Bracelet to reconnect.';
+        statusText.textContent = 'Bracelet disconnected. Click Connect to reconnect.';
         clearReading();
         connectButton.disabled = false;
       });
