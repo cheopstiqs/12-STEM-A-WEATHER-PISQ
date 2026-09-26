@@ -273,6 +273,30 @@ footer a { color: rgba(246,244,239,0.6); }
   margin: 0 0 7px;
   font: 400 clamp(24px, 5vw, 32px)/1.1 'Fraunces', Georgia, serif;
   letter-spacing: -0.02em;
+  display: inline-block;
+  cursor: default;
+  transition: text-shadow 200ms ease, transform 200ms ease;
+  animation: stormFlicker 5s infinite;
+}
+
+/* Periodic lightning-like flicker, like distant storm flashes */
+@keyframes stormFlicker {
+  0%, 100%   { text-shadow: 0 0 6px rgba(255,214,140,0.12); }
+  3%         { text-shadow: 0 0 24px rgba(255,255,255,0.95), 0 0 46px rgba(150,190,255,0.65); }
+  3.6%       { text-shadow: 0 0 6px rgba(255,214,140,0.12); }
+  4.2%       { text-shadow: 0 0 32px rgba(255,255,255,1), 0 0 60px rgba(150,190,255,0.85); }
+  4.8%       { text-shadow: 0 0 6px rgba(255,214,140,0.12); }
+  62%        { text-shadow: 0 0 6px rgba(255,214,140,0.12); }
+  62.5%      { text-shadow: 0 0 18px rgba(255,255,255,0.8); }
+  63%        { text-shadow: 0 0 6px rgba(255,214,140,0.12); }
+}
+
+/* Bigger, sustained glow on hover (desktop) or tap (mobile) */
+#bracelet-section h2:hover,
+#bracelet-section h2:active {
+  animation-play-state: paused;
+  text-shadow: 0 0 26px rgba(255,255,255,1), 0 0 55px rgba(150,190,255,0.9), 0 0 90px rgba(150,190,255,0.5);
+  transform: scale(1.035);
 }
 
 #bracelet-section .bracelet-intro {
